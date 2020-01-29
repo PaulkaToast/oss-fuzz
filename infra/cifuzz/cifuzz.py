@@ -74,7 +74,7 @@ def build_fuzzers(project_name, project_repo_name, commit_sha, git_workspace,
   try:
     build_repo_manager.checkout_commit(commit_sha)
   except repo_manager.RepoManagerError:
-    logging.error('Specified commit does not exist.')
+    logging.error('Specified commit %s does not exist.', commit_sha)
     # NOTE: Remove return statement for testing.
     return False
 
