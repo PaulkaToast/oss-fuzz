@@ -1,0 +1,20 @@
+name: CIFuzz
+
+on: [push]
+
+jobs:
+  fuzz:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Building and running fuzzers
+      uses: google/oss-fuzz/infra/cifuzz/actions@master
+      with:
+        project-name: 'example'
+        fuzz-time: 360
+    - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: fuzzer_testcase
+        path: ./out/testcase
