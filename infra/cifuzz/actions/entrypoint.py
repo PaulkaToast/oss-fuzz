@@ -44,7 +44,7 @@ def main():
   oss_fuzz_project_name = os.environ.get('PROJECT_NAME')
   fuzz_seconds = int(os.environ.get('FUZZ_SECONDS', 360))
   github_repo_name = os.path.basename(os.environ.get('GITHUB_REPOSITORY'))
-  commit_sha = os.environ.get('GITHUB_SHA')
+  commit_sha = os.environ.get('GITHUB_REF')
 
   # Get the shared volume directory and create required directorys.
   workspace = os.environ.get('GITHUB_WORKSPACE')
