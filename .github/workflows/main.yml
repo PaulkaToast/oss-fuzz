@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - name: Building and running fuzzers
-      uses: google/oss-fuzz/infra/cifuzz/actions@master
+      uses: Leo-Neat/oss-fuzz/infra/cifuzz/actions@master
       with:
         project-name: 'example'
         fuzz-time: 360
