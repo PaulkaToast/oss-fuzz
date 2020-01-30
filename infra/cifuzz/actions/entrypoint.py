@@ -46,6 +46,7 @@ def main():
   github_repo_name = os.path.basename(os.environ.get('GITHUB_REPOSITORY'))
   commit_sha = os.environ.get('GITHUB_REF')
 
+  print('Event', os.environ.get('GITHUB_EVENT_NAME'))
   # Get the shared volume directory and create required directorys.
   workspace = os.environ.get('GITHUB_WORKSPACE')
   if not workspace:
