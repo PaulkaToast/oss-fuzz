@@ -37,6 +37,7 @@ def main():
     FUZZ_TIME: The length of time in seconds that fuzzers are to be run.
     GITHUB_REPOSITORY: The name of the Github repo that called this script.
     GITHUB_SHA: The commit SHA that triggered this script.
+    GITHUB_REF: The git reference that triggered this script.
 
   Returns:
     0 on success or 1 on Failure.
@@ -44,11 +45,11 @@ def main():
   oss_fuzz_project_name = os.environ.get('PROJECT_NAME')
   fuzz_seconds = int(os.environ.get('FUZZ_SECONDS', 360))
   github_repo_name = os.path.basename(os.environ.get('GITHUB_REPOSITORY'))
-  commit_sha = os.environ.get('GITHUB_REF')
+  pr_ref = os.environ.get('GITHUB_REF')
+  commit_sha = os.environ.get('GITHUB_SHA')
+  event = os.environ.get('GITHUB_EVENT_NAME')
 
-  logging.error('Event', os.environ.get('GITHUB_EVENT_NAME'))
   # Get the shared volume directory and create required directorys.
-  """
   workspace = os.environ.get('GITHUB_WORKSPACE')
   if not workspace:
     logging.error('This script needs to be run in the Github action context.')
@@ -58,11 +59,29 @@ def main():
   out_dir = os.path.join(workspace, 'out')
   os.makedirs(out_dir, exist_ok=True)
 
-  # Build the specified project's fuzzers from the current repo state.
-  if not cifuzz.build_fuzzers(oss_fuzz_project_name, github_repo_name,
-                              commit_sha, git_workspace, out_dir):
-    logging.error('Error building fuzzers for project %s.',
-                  oss_fuzz_project_name)
+  if event == 'push':
+    # Build the specified project's fuzzers from the current repo state.
+    if not cifuzz.build_fuzzers(oss_fuzz_project_name,
+                                github_repo_name,
+                                git_workspace,
+                                out_dir,
+                                commit_sha=commit_sha):
+      logging.error('Error building fuzzers for project %s with commit %s.',
+                    oss_fuzz_project_name, commit_sha)
+      return 1
+  elif event == 'pull_request':
+    # Build the specified project's fuzzers from the current repo state.
+    if not cifuzz.build_fuzzers(oss_fuzz_project_name,
+                                github_repo_name,
+                                git_workspace,
+                                out_dir,
+                                pr_ref=pr_ref):
+      logging.error(
+          'Error building fuzzers for project %s with pull request %s.',
+          oss_fuzz_project_name, pr_ref)
+      return 1
+  else:
+    logging.error('Not %s is not a valid github action for CIFuzz.', event)
     return 1
 
   # Run the specified project's fuzzers from the build.
@@ -77,7 +96,7 @@ def main():
     # Return 2 when a bug was found by a fuzzer causing the CI to fail.
     return 2
   return 0
-  """
+
 
 if __name__ == '__main__':
   sys.exit(main())
