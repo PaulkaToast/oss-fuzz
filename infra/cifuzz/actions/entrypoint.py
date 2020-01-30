@@ -46,8 +46,9 @@ def main():
   github_repo_name = os.path.basename(os.environ.get('GITHUB_REPOSITORY'))
   commit_sha = os.environ.get('GITHUB_REF')
 
-  print('Event', os.environ.get('GITHUB_EVENT_NAME'))
+  logging.error('Event', os.environ.get('GITHUB_EVENT_NAME'))
   # Get the shared volume directory and create required directorys.
+  """
   workspace = os.environ.get('GITHUB_WORKSPACE')
   if not workspace:
     logging.error('This script needs to be run in the Github action context.')
@@ -76,7 +77,7 @@ def main():
     # Return 2 when a bug was found by a fuzzer causing the CI to fail.
     return 2
   return 0
-
+  """
 
 if __name__ == '__main__':
   sys.exit(main())
