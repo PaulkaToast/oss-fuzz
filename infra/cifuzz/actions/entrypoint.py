@@ -17,6 +17,7 @@ import os
 import sys
 
 # pylint: disable=wrong-import-position
+# pylint: disable=import-error
 sys.path.append(os.path.join(os.environ['OSS_FUZZ_ROOT'], 'infra', 'cifuzz'))
 import cifuzz
 
@@ -49,8 +50,6 @@ def main():
   pr_ref = os.environ.get('GITHUB_REF')
   commit_sha = os.environ.get('GITHUB_SHA')
   event = os.environ.get('GITHUB_EVENT_NAME')
-
-  # Get the shared volume directory and create required directorys.
   workspace = os.environ.get('GITHUB_WORKSPACE')
 
   # Check if failures should be reported.
@@ -58,17 +57,13 @@ def main():
   if not failure_allowed:
     out_dir = os.path.join(workspace, 'out')
     os.makedirs(out_dir, exist_ok=True)
-    f = open(os.path.join(out_dir, 'testcase'), "a")
-    f.write('No bugs detected.')
-    f.close()
+    file_handle = open(os.path.join(out_dir, 'testcase'), "a")
+    file_handle.write('No bugs detected.')
+    file_handle.close()
 
   if not workspace and failure_allowed:
     logging.error('This script needs to be run in the Github action context.')
     return 1
-  git_workspace = os.path.join(workspace, 'storage')
-  os.makedirs(git_workspace, exist_ok=True)
-  out_dir = os.path.join(workspace, 'out')
-  os.makedirs(out_dir, exist_ok=True)
 
   if event == 'push' and not cifuzz.build_fuzzers(
       oss_fuzz_project_name, github_repo_name, workspace,
