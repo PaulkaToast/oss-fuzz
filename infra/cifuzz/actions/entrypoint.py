@@ -48,7 +48,7 @@ def main():
   workspace = os.environ.get('GITHUB_WORKSPACE')
 
   # Check if failures should be reported.
-  failure_allowed =  (os.environ.get('FAILURE_ALLOWED').lower() == 'true')
+  failure_allowed = (os.environ.get('FAILURE_ALLOWED').lower() == 'true')
   if not failure_allowed:
     out_dir = os.path.join(workspace, 'out')
     os.makedirs(out_dir, exist_ok=True)
@@ -66,7 +66,8 @@ def main():
 
   # Build the specified project's fuzzers from the current repo state.
   if not cifuzz.build_fuzzers(oss_fuzz_project_name, github_repo_name,
-                              commit_sha, git_workspace, out_dir) and failure_allowed:
+                              commit_sha, git_workspace,
+                              out_dir) and failure_allowed:
     logging.error('Error building fuzzers for project %s.',
                   oss_fuzz_project_name)
     return 1
