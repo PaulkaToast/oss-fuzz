@@ -54,15 +54,15 @@ def main():
   workspace = os.environ.get('GITHUB_WORKSPACE')
 
   # Check if failures should be reported.
-  failure_ok = not os.environ.get('NO_FAILURE')
-  if not failure_ok:
+  failure_allowed = (os.environ.get('FAILURE_ALLOWED').lower() == 'true')
+  if not failure_allowed:
     out_dir = os.path.join(workspace, 'out')
     os.makedirs(out_dir, exist_ok=True)
     f = open(os.path.join(out_dir, 'testcase'), "a")
-    f.write('There was no bug detected.')
+    f.write('No bugs detected.')
     f.close()
 
-  if not workspace and failure_ok:
+  if not workspace and failure_allowed:
     logging.error('This script needs to be run in the Github action context.')
     return 1
   git_workspace = os.path.join(workspace, 'storage')
@@ -70,15 +70,15 @@ def main():
   out_dir = os.path.join(workspace, 'out')
   os.makedirs(out_dir, exist_ok=True)
 
-
   if event == 'push' and not cifuzz.build_fuzzers(
       oss_fuzz_project_name, github_repo_name, workspace,
-      commit_sha=commit_sha):
+      commit_sha=commit_sha) and failure_allowed:
     logging.error('Error building fuzzers for project %s with commit %s.',
                   oss_fuzz_project_name, commit_sha)
     return 1
   if event == 'pull_request' and not cifuzz.build_fuzzers(
-      oss_fuzz_project_name, github_repo_name, workspace, pr_ref=pr_ref):
+      oss_fuzz_project_name, github_repo_name, workspace,
+      pr_ref=pr_ref) and failure_allowed:
     logging.error('Error building fuzzers for project %s with pull request %s.',
                   oss_fuzz_project_name, pr_ref)
     return 1
@@ -86,11 +86,11 @@ def main():
   # Run the specified project's fuzzers from the build.
   run_status, bug_found = cifuzz.run_fuzzers(oss_fuzz_project_name,
                                              fuzz_seconds, workspace)
-  if not run_status:
+  if not run_status and failure_allowed:
     logging.error('Error occured while running fuzzers for project %s.',
                   oss_fuzz_project_name)
     return 1
-  if bug_found and failure_ok:
+  if bug_found and failure_allowed:
     logging.info('Bug found.')
     # Return 2 when a bug was found by a fuzzer causing the CI to fail.
     return 2
