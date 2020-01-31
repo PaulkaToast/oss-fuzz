@@ -45,10 +45,17 @@ def main():
   fuzz_seconds = int(os.environ.get('FUZZ_SECONDS', 360))
   github_repo_name = os.path.basename(os.environ.get('GITHUB_REPOSITORY'))
   commit_sha = os.environ.get('GITHUB_SHA')
-
-  # Get the shared volume directory and create required directorys.
   workspace = os.environ.get('GITHUB_WORKSPACE')
-  if not workspace:
+
+  # Check if failures should be reported.
+  failure_ok = not os.environ.get('NO_FAILURE')
+  if not failure_ok:
+    out_dir = os.path.join(workspace, 'out')
+    os.makedirs(out_dir, exist_ok=True)
+    f = open(out_dir, 'testcase'), "a")
+    f.write('There was no bug detected.')
+
+  if not workspace and failure_ok:
     logging.error('This script needs to be run in the Github action context.')
     return 1
   git_workspace = os.path.join(workspace, 'storage')
@@ -58,7 +65,7 @@ def main():
 
   # Build the specified project's fuzzers from the current repo state.
   if not cifuzz.build_fuzzers(oss_fuzz_project_name, github_repo_name,
-                              commit_sha, git_workspace, out_dir):
+                              commit_sha, git_workspace, out_dir) and failure_ok:
     logging.error('Error building fuzzers for project %s.',
                   oss_fuzz_project_name)
     return 1
@@ -66,11 +73,11 @@ def main():
   # Run the specified project's fuzzers from the build.
   run_status, bug_found = cifuzz.run_fuzzers(oss_fuzz_project_name,
                                              fuzz_seconds, out_dir)
-  if not run_status:
+  if not run_status and failure_ok:
     logging.error('Error occured while running fuzzers for project %s.',
                   oss_fuzz_project_name)
     return 1
-  if bug_found:
+  if bug_found and failure_ok:
     logging.info('Bug found.')
     # Return 2 when a bug was found by a fuzzer causing the CI to fail.
     return 2
