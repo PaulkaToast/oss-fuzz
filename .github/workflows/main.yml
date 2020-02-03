@@ -13,6 +13,7 @@ jobs:
       with:
         project-name: 'example'
         fuzz-time: 360
+        failure-allowed: True
     - uses: actions/upload-artifact@v1
       if: failure()
       with:
