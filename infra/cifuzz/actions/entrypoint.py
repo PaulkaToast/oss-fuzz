@@ -54,7 +54,7 @@ def main():
 
   # Check if failures should be reported.
   dry_run = (os.environ.get('DRY_RUN').lower() == 'true')
-  print('Dry run: ', dry_run)
+  
   # The default return code when an error occurs.
   error_code = 1
   if dry_run:
