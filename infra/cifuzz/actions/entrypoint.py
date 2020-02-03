@@ -53,15 +53,18 @@ def main():
   workspace = os.environ.get('GITHUB_WORKSPACE')
 
   # Check if failures should be reported.
-  failure_allowed = (os.environ.get('FAILURE_ALLOWED').lower() == 'true')
+  dry_run = bool(os.environ.get('DRY_RUN'))
 
+  # The default return code when an error occurs.
   error_code = 1
-  if not failure_allowed:
+  if dry_run:
     out_dir = os.path.join(workspace, 'out')
     os.makedirs(out_dir, exist_ok=True)
     file_handle = open(os.path.join(out_dir, 'testcase'), 'a')
     file_handle.write('No bugs detected.')
     file_handle.close()
+
+    # Sets the default return code on error to success.
     error_code = 0
 
   if not workspace:
@@ -87,10 +90,11 @@ def main():
     logging.error('Error occured while running fuzzers for project %s.',
                   oss_fuzz_project_name)
     return error_code
-  if bug_found and failure_allowed:
+  if bug_found:
     logging.info('Bug found.')
-    # Return 2 when a bug was found by a fuzzer causing the CI to fail.
-    return 2
+    if not dry_run:
+      # Return 2 when a bug was found by a fuzzer causing the CI to fail.
+      return 2
   return 0
 
 
