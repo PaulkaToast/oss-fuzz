@@ -35,7 +35,7 @@ RUN add-apt-repository \
 RUN apt-get update && apt-get install docker-ce docker-ce-cli containerd.io -y
 
 ENV OSS_FUZZ_ROOT=/opt/oss-fuzz
-RUN git clone https://github.com/google/oss-fuzz.git ${OSS_FUZZ_ROOT}
+RUN git clone https://github.com/Leo-Neat/oss-fuzz.git ${OSS_FUZZ_ROOT}
 
 # Copies your code file from  action repository to the container
 COPY run_fuzzers_entrypoint.py /opt/run_fuzzers_entrypoint.py
