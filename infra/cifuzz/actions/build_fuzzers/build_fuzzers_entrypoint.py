@@ -33,8 +33,8 @@ def main():
   entrypoint of the Dockerfile in this directory. This action can be added to
   any OSS-Fuzz project's workflow that uses Github.
 
-  Note: The resulting binaries of this build are placed in the directory:
-  ${GITHUB_WORKSPACE}/out
+  Note: The resulting clusterfuzz binaries of this build are placed in
+  the directory: ${GITHUB_WORKSPACE}/out
 
   Required environment variables:
     PROJECT_NAME: The name of OSS-Fuzz project.
@@ -53,9 +53,6 @@ def main():
   commit_sha = os.environ.get('GITHUB_SHA')
   event = os.environ.get('GITHUB_EVENT_NAME')
   workspace = os.environ.get('GITHUB_WORKSPACE')
-  if not workspace:
-    logging.error('This script needs to be run in the Github action context.')
-    return error_code
 
   # Check if failures should not be reported.
   dry_run = (os.environ.get('DRY_RUN').lower() == 'true')
