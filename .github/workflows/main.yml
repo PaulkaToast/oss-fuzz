@@ -6,10 +6,10 @@ jobs:
   Fuzzing:
 
     runs-on: ubuntu-latest
-    with:
-      project-name: 'example'
-      dry-run: False
     steps:
+      with:
+        project-name: 'example'
+        dry-run: False
     - name: Building Fuzzers
       uses: Leo-Neat/oss-fuzz/infra/cifuzz/actions/build_fuzzers@master
     - name: Running Fuzzers
