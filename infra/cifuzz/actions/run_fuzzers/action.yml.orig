@@ -1,0 +1,29 @@
+# action.yml
+name: 'run-fuzzers'
+description: 'Runs fuzz target binaries for a specified length of time.'
+inputs:
+<<<<<<< HEAD
+  project-name:
+=======
+  oss-fuzz-project-name:
+>>>>>>> upstream/regression-test
+    description: 'The OSS-Fuzz project name.'
+    required: false
+  fuzz-seconds:
+    description: 'The total time allotted for fuzzing in seconds.'
+    required: true
+    default: 600
+  dry-run:
+    description: 'If set, run the action without actually reporting a failure.'
+    default: false
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  env:
+<<<<<<< HEAD
+    PROJECT_NAME: ${{ inputs.project-name }}
+=======
+    OSS_FUZZ_PROJECT_NAME: ${{ inputs.oss-fuzz-project-name }}
+>>>>>>> upstream/regression-test
+    FUZZ_SECONDS: ${{ inputs.fuzz-seconds }}
+    DRY_RUN: ${{ inputs.dry-run}}
